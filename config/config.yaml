@@ -1,0 +1,5 @@
+# Files
+adapters: "/home/uibk/c7701188/bio/bbmap/resources/adapters.fa"
+ref: "/scratch/uibk/c7701188/ta/dn/ref/Talp.v1.0.assembly.fasta"
+samplesSub: 'samples24.txt'
+ids: 'samples109.txt'
