@@ -2,7 +2,7 @@
 
 ======================================================
 
-Snakemake workflow for Endometrium Breast Mutation analysis. This is not a finished repository, but work in progress.  
+Snakemake workflow for Endometrium Breast Mutation analysis. This is not a finished repository, but represents work in progress.  
 
 <br/>  
 
