@@ -2,8 +2,7 @@
 
 ======================================================
 
-Snakemake workflow for Endometrium Breast Mutation analysis 
-(can be used on mach2).  
+Snakemake workflow for Endometrium Breast Mutation analysis. This is not a finished repository, but work in progress.  
 
 <br/>  
 
