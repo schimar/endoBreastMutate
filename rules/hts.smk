@@ -3,10 +3,11 @@ rule qc:
         r1 = lambda wildcards: getFqHome(wildcards.sample)[0],
         r2 = lambda wildcards: getFqHome(wildcards.sample)[1]
     output:
-        "raw/qc/fastqc/{sample}_R1_001_fastqc.html",
-        "raw/qc/fastqc/{sample}_R1_001_fastqc.zip",
-        "raw/qc/fastqc/{sample}_R2_001_fastqc.html",
-        "raw/qc/fastqc/{sample}_R2_001_fastqc.zip"
+        touch("raw/qc/fastqc/{sample}_qc.done")
+        #"raw/qc/{sample}_R1_001_fastqc.html",
+        #"raw/qc/{sample}_R1_001_fastqc.zip",
+        #"raw/qc/{sample}_R2_001_fastqc.html",
+        #"raw/qc/{sample}_R2_001_fastqc.zip"
     #log: "log/{sample}.qc.log.txt"
     #resources:
     #    mem = 1000,
@@ -31,8 +32,9 @@ rule trim:
     message: """--- Quality trimming of fastq files before mapping."""
     shell: 
         """
-        bbduk.sh -Xmx1g in1={input.r1} in2={input.r2} out1={output.r1trmd} out2={output.r2trmd} trimq=6 qtrim=r hdist=1 bhist=trm/hist/{wildcards.sample}.bhist qhist=trm/hist/{wildcards.sample}.qhist lhist=trm/hist/{wildcards.sample}.lhist tpe tbo 
+        /home/schimar/bio/bbmap/bbduk.sh -Xmx1g in1={input.r1} in2={input.r2} out1={output.r1trmd} out2={output.r2trmd} trimq=6 qtrim=r hdist=1 bhist=trm/hist/{wildcards.sample}.bhist qhist=trm/hist/{wildcards.sample}.qhist lhist=trm/hist/{wildcards.sample}.lhist tpe tbo 
         """
+
 
 rule refIndex:
 	input:
@@ -41,7 +43,7 @@ rule refIndex:
 		'ref/genome/1/summary.txt'
 	shell:
 		"""
-		bbmap.sh ref={input.ref}
+		/home/schimar/bio/bbmap/bbmap.sh -Xmx24g ref={input.ref}
 		"""
 
 
@@ -51,19 +53,19 @@ rule map:
 		tr2 = lambda wildcards: getTrmHome(wildcards.sample)[1],
 		ref = config["ref"]
 	output:
-		bam = "bbmap/{sample}.bam"
-	threads: 24
+		bam = "map/{sample}.bam"
+	threads: 12
 	message: """--- Mapping reads to reference genome ---"""
 	shell:
 		"""
-		bbmap.sh -Xmx50g t={threads} ref={input.ref} in1={input.tr1} in2={input.tr2} out=stdout.sam minid=0.85 rgid={wildcards.sample} rglb=igaDNA rgsm={wildcards.sample} rgpl=ILLUMINA overwrite=f unpigz=t | samtools view -F 4 -Shu - | samtools sort - -o {output.bam}
+		/home/schimar/bio/bbmap/bbmap.sh -Xmx20g t={threads} ref={input.ref} in1={input.tr1} in2={input.tr2} out=stdout.sam minid=0.85 rgid={wildcards.sample} rglb=igaDNA rgsm={wildcards.sample} rgpl=ILLUMINA overwrite=f unpigz=t | samtools view -F 4 -Shu - | samtools sort - -o {output.bam}
 		"""
 
 rule bamIndex:
 	input: 
-		aln = 'bbmap/{sample}.bam'	
+		aln = 'map/{sample}.bam'	
 	output:
-		idx = "bbmap/{sample}.bam.bai"
+		touch("map/{sample}.map.done")
 	threads: 2
 	message: """--- Indexing with samtools ---"""
 	shell:

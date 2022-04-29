@@ -26,9 +26,10 @@ configfile:
   "config/config.yaml"
 
 # load sample info 
-#samples24 = pd.read_csv(config['samplesSub'], sep='\t', index_col=False)
+ids = pd.read_csv(config['ids'], sep='\t', index_col=False, header= 0)
 #
-#sample_names = list(samples24['sample'])
+sample_names = list(ids['samples'])
+idsuniq = list(np.unique(ids['ids']))
 #sample_locations = list(samples24['location'])
 #samples_set = zip(sample_names, sample_locations)
 #samples_dict = dict(zip(sample_names, sample_locations))
@@ -42,8 +43,14 @@ configfile:
 
 ###### helper functions ######
 
+# NOTE: need to get the lanes in here, as we have 4 lanes per individual  
+
 def getFqHome(sample):
-  return(list(os.path.join(samples_dict[sample],"{0}_{1}_001.fastq.gz".format(sample,pair)) for pair in ['R1','R2']))
+  return(list(os.path.join("raw", "{0}_{1}_001.fastq.gz".format(sample,pair)) for pair in ['R1','R2']))
+
+#def getFqHome(sample):
+#  return(list(os.path.join(sample,"{0}_{1}_001.fastq.gz".format(sample,pair)) for pair in ['R1','R2']))
+
 
 def getTrmHome(sample):
   return(list(os.path.join('trm', "{0}_{1}.fq.gz".format(sample,pair)) for pair in ['R1','R2']))
