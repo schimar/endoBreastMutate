@@ -50,6 +50,19 @@ rule errorCorrect:
         # ~/bio/bbmap/tadpole.sh -Xmx12g in1=trm/mrg/Mimi-24A_S5_R1.fq.gz in2=trm/mrg/Mimi-24A_S5_R2.fq.gz out1=trm/mrg/Mimi-24A_S5_R1.eco.fq.gz out2=trm/mrg/Mimi-24A_S5_R2.eco.fq.gz mode=correct k=50 overwrite=t
         """
 
+rule dedupe:
+    input:
+      # 
+    output:
+      # 
+    threads: 8
+    message: """deduplication of reads. """
+    shell:
+        """
+
+        """
+
+
 
 rule mergeFQs:
     input:
