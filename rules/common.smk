@@ -49,7 +49,6 @@ idskeys = list(idsdict.keys())
 
 ###### helper functions ######
 
-# NOTE: need to get the lanes in here, as we have 4 lanes per individual  
 
 def getFqHome(sample):
   return(list(os.path.join("raw", "{0}_{1}_001.fastq.gz".format(sample,pair)) for pair in ['R1','R2']))

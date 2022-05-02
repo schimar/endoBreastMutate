@@ -64,11 +64,7 @@ rule mergeFQs:
       #  for c in commands:
       #    shell(c)
 
-        
-        ##"""
-        ##cat {output.R1} && cat {output.R2}  
-        ##"""
-
+ 
 rule refIndex:
 	input:
 		ref = config['ref']
