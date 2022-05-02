@@ -52,17 +52,23 @@ rule errorCorrect:
 
 rule dedupe:
     input:
-      # 
+        # 
     output:
-      # 
+        # 
     threads: 8
-    message: """deduplication of reads. """
+    message: """Deduplication of reads."""
     shell:
         """
 
         """
 
-
+rule covStats:
+    input:
+        #
+    output:
+        # 
+    threads: 8
+    message: """Calculating coverage statistics."""
 
 rule mergeFQs:
     input:
