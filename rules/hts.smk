@@ -31,10 +31,23 @@ rule trim:
         r1trmd = "trm/{sample}_R1.fq.gz",
         r2trmd = "trm/{sample}_R2.fq.gz"
     threads: 2
-    message: """--- Quality trimming of fastq files before mapping."""
+    message: """--- Quality trimming of fastq files."""
     shell: 
         """
         /home/schimar/bio/bbmap/bbduk.sh -Xmx1g in1={input.r1} in2={input.r2} out1={output.r1trmd} out2={output.r2trmd} trimq=6 qtrim=r hdist=1 bhist=trm/hist/{wildcards.sample}.bhist qhist=trm/hist/{wildcards.sample}.qhist lhist=trm/hist/{wildcards.sample}.lhist tpe tbo 
+        """
+
+
+rule errorCorrect:
+    input: 
+        # all fq files (r1 & r2)
+    output:
+        # error-corrected fq files 
+    threads: 8
+    message: """Error-correction of fastq files."""
+    shell:
+        """
+        # ~/bio/bbmap/tadpole.sh -Xmx12g in1=trm/mrg/Mimi-24A_S5_R1.fq.gz in2=trm/mrg/Mimi-24A_S5_R2.fq.gz out1=trm/mrg/Mimi-24A_S5_R1.eco.fq.gz out2=trm/mrg/Mimi-24A_S5_R2.eco.fq.gz mode=correct k=50 overwrite=t
         """
 
 
@@ -51,6 +64,7 @@ rule mergeFQs:
     output:
         r1 = "trm/mrg/{idskeys}_R1.fq.gz",
         r2 = "trm/mrg/{idskeys}_R2.fq.gz" 
+    message: """merging fastq files for the same individuals."""
     shell:
         """
         cat {input.l1r1} {input.l2r1} {input.l3r1} {input.l4r1} > {output.r1} 
