@@ -29,7 +29,13 @@ configfile:
 ids = pd.read_csv(config['ids'], sep='\t', index_col=False, header= 0)
 #
 sample_names = list(ids['samples'])
+inds = list(ids['ids'])
 idsuniq = list(np.unique(ids['ids']))
+
+idsgroup = ids.groupby("ids")
+idsdict = idsgroup.apply(lambda x: x['samples'].unique()).to_dict()
+idskeys = list(idsdict.keys())
+
 #sample_locations = list(samples24['location'])
 #samples_set = zip(sample_names, sample_locations)
 #samples_dict = dict(zip(sample_names, sample_locations))

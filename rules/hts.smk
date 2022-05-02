@@ -22,6 +22,8 @@ rule qc:
 
 rule trim:
     input:
+        #r1 = expand("raw/{sample}_R1_001.fastq.gz", sample=sample_names),
+        #r2 = expand("raw/{sample}_R2_001.fastq.gz", sample=sample_names),
         r1 = lambda wildcards: getFqHome(wildcards.sample)[0],
         r2 = lambda wildcards: getFqHome(wildcards.sample)[1],
         adapters = config["adapters"]
@@ -35,6 +37,37 @@ rule trim:
         /home/schimar/bio/bbmap/bbduk.sh -Xmx1g in1={input.r1} in2={input.r2} out1={output.r1trmd} out2={output.r2trmd} trimq=6 qtrim=r hdist=1 bhist=trm/hist/{wildcards.sample}.bhist qhist=trm/hist/{wildcards.sample}.qhist lhist=trm/hist/{wildcards.sample}.lhist tpe tbo 
         """
 
+
+rule mergeFQs:
+    input:
+        l1r1 = "trm/{idskeys}_L001_R1.fq.gz", 
+        l1r2 = "trm/{idskeys}_L001_R2.fq.gz", 
+        l2r1 = "trm/{idskeys}_L002_R1.fq.gz", 
+        l2r2 = "trm/{idskeys}_L002_R2.fq.gz", 
+        l3r1 = "trm/{idskeys}_L003_R1.fq.gz", 
+        l3r2 = "trm/{idskeys}_L003_R2.fq.gz", 
+        l4r1 = "trm/{idskeys}_L004_R1.fq.gz", 
+        l4r2 = "trm/{idskeys}_L004_R2.fq.gz" 
+    output:
+        r1 = "trm/mrg/{idskeys}_R1.fq.gz",
+        r2 = "trm/mrg/{idskeys}_R2.fq.gz" 
+    shell:
+        """
+        cat {input.l1r1} {input.l2r1} {input.l3r1} {input.l4r1} > {output.r1} 
+        cat {input.l1r2} {input.l2r2} {input.l3r2} {input.l4r2} > {output.r2} 
+        """
+
+
+      #  commands = [
+      #      "cat trm/\* > trm/mrg/{output.R1}"    
+      #      ] 
+      #  for c in commands:
+      #    shell(c)
+
+        
+        ##"""
+        ##cat {output.R1} && cat {output.R2}  
+        ##"""
 
 rule refIndex:
 	input:
@@ -65,12 +98,12 @@ rule bamIndex:
 	input: 
 		aln = 'map/{sample}.bam'	
 	output:
-		touch("map/{sample}.map.done")
+		touch("map/{sample}.bamIndex.done")
 	threads: 2
 	message: """--- Indexing with samtools ---"""
 	shell:
 		"""
-		samtools index {input.aln} {output.idx}
+		samtools index {input.aln} 
 		"""
 
 

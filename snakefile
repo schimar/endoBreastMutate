@@ -9,8 +9,9 @@ rule all:
     input:
         expand('raw/qc/fastqc/{sample}_qc.done', sample=sample_names), #, ext=['html', 'zip']),
 	    ##expand('../nextseq/qc/fastqc/{sample}_{pair}_001_fastqc.{ext}', sample=sample_names, pair=['R1', 'R2'], ext=['html', 'zip']),
-        expand('trm/{sample}_{pair}.fq.gz', sample=sample_names, pair=['R1','R2']), 
-	    expand('map/{sample}.{ext}', sample=sample_names, ext=['bam', 'bam.bai']),
+        expand('trm/{sample}_{lane}_{pair}.fq.gz', sample=inds, lane=['L001','L002','L003','L004'], pair=['R1','R2']), 
+        expand('trm/mrg/{ids}_{pair}.fq.gz', ids=idskeys, pair=['R1','R2']),
+	    #expand('map/{sample}.{ext}', sample=sample_names, ext=['bam', 'bamIndex.done']),
 	    'ref/genome/1/summary.txt',
 	    ##expand('bbmap/{sample}.bam', sample=ids['sample']),
 	    ##expand('bbmap/{sample}.done', sample=ids['sample']),
