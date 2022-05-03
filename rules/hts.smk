@@ -4,10 +4,6 @@ rule qc:
         r2 = lambda wildcards: getFqHome(wildcards.sample)[1]
     output:
         touch("raw/qc/fastqc/{sample}_qc.done")
-        #"raw/qc/{sample}_R1_001_fastqc.html",
-        #"raw/qc/{sample}_R1_001_fastqc.zip",
-        #"raw/qc/{sample}_R2_001_fastqc.html",
-        #"raw/qc/{sample}_R2_001_fastqc.zip"
     #log: "log/{sample}.qc.log.txt"
     #resources:
     #    mem = 1000,
@@ -22,6 +18,8 @@ rule qc:
 
 rule trim:
     input:
+        #r1 = "raw/{sample}_{lane}_R1_001.fastq.gz",
+        #r2 = "raw/{sample}_{lane}_R2_001.fastq.gz",
         #r1 = expand("raw/{sample}_R1_001.fastq.gz", sample=sample_names),
         #r2 = expand("raw/{sample}_R2_001.fastq.gz", sample=sample_names),
         r1 = lambda wildcards: getFqHome(wildcards.sample)[0],
@@ -38,29 +36,38 @@ rule trim:
         """
 
 
-rule errorCorrect:
-    input: 
-        # all fq files (r1 & r2)
-    output:
-        # error-corrected fq files 
-    threads: 8
-    message: """Error-correction of fastq files."""
-    shell:
-        """
-        # ~/bio/bbmap/tadpole.sh -Xmx12g in1=trm/mrg/Mimi-24A_S5_R1.fq.gz in2=trm/mrg/Mimi-24A_S5_R2.fq.gz out1=trm/mrg/Mimi-24A_S5_R1.eco.fq.gz out2=trm/mrg/Mimi-24A_S5_R2.eco.fq.gz mode=correct k=50 overwrite=t
-        """
-
-rule dedupe:
+rule clumpify:
     input:
-        # 
+        r1 = "trm/{sample}_{lane}_R1.fq.gz",
+        r2 = "trm/{sample}_{lane}_R2.fq.gz"
     output:
-        # 
+        r1 = "trm/ddp/{sample}_{lane}_R1.fq.gz",
+        r2 = "trm/ddp/{sample}_{lane}_R2.fq.gz",
+    log: "trm/ddp/{sample}_{lane}.log"
     threads: 8
-    message: """Deduplication of reads."""
+    message: """Deduplication of reads using clumpify."""
     shell:
         """
-
+        /home/schimar/bio/bbmap/clumpify.sh Xmx16g in1={input.r1} in2={input.r2} out1={output.r1} out2={output.r2} dedupe=t ecc=t optical=t spany=t adjacent=t dupedist=40 unpair=t repair=t 2> {log}  
         """
+# >> {output.smp} 2>&1
+
+rule tadpole:
+    input: 
+        r1 = "trm/ddp/{sample}_{lane}_R1.fq.gz",
+        r2 = "trm/ddp/{sample}_{lane}_R2.fq.gz"
+    output:
+        r1eco = "trm/eco/{sample}_{lane}_R1.fq.gz",
+        r2eco = "trm/eco/{sample}_{lane}_R2.fq.gz",
+    log: "trm/eco/{sample}_{lane}.log"
+    priority: 50
+    threads: 8
+    message: """Error-correction of fastq files with tadpole."""
+    shell:
+        """
+        /home/schimar/bio/bbmap/tadpole.sh -Xmx16g in1={input.r1} in2={input.r2} out1={output.r1eco} out2={output.r2eco} mode=correct k=50 overwrite=t 2> {log}
+        """
+# >> {output.smp} 2>&1
 
 rule covStats:
     input:
@@ -83,7 +90,7 @@ rule mergeFQs:
     output:
         r1 = "trm/mrg/{idskeys}_R1.fq.gz",
         r2 = "trm/mrg/{idskeys}_R2.fq.gz" 
-    message: """merging fastq files for the same individuals."""
+    message: """Concatenating fastq files for the same individuals."""
     shell:
         """
         cat {input.l1r1} {input.l2r1} {input.l3r1} {input.l4r1} > {output.r1} 
