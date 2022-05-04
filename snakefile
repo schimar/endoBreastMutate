@@ -9,8 +9,8 @@ rule all:
     input:
         expand('raw/qc/fastqc/{sample}_qc.done', sample=sample_names), #, ext=['html', 'zip']),
         expand('trm/{sample}_{lane}_{pair}.fq.gz', sample=inds, lane=['L001','L002','L003','L004'], pair=['R1','R2']),		# trim 
-	    expand('trm/ddp/{ids}_{lane}_{pair}.fq.gz', ids=inds, lane=['L001','L002','L003','L004'], pair=['R1', 'R2']),		# clumpify 
-	    expand('trm/eco/{ids}_{lane}_{pair}.fq.gz', ids=inds, lane=['L001','L002','L003','L004'], pair=['R1', 'R2']),		# tadpole 
+	    expand('trm/clu/{ids}_{lane}_{pair}.fq.gz', ids=inds, lane=['L001','L002','L003','L004'], pair=['R1', 'R2']),		# clumpify 
+	    expand('trm/tad/{ids}_{lane}_{pair}.fq.gz', ids=inds, lane=['L001','L002','L003','L004'], pair=['R1', 'R2']),		# tadpole 
 
         #expand('trm/mrg/{ids}_{pair}.fq.gz', ids=idskeys, pair=['R1','R2']),
 	    #expand('map/{sample}.{ext}', sample=sample_names, ext=['bam', 'bamIndex.done']),

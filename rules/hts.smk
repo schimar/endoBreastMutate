@@ -41,30 +41,30 @@ rule clumpify:
         r1 = "trm/{sample}_{lane}_R1.fq.gz",
         r2 = "trm/{sample}_{lane}_R2.fq.gz"
     output:
-        r1 = "trm/ddp/{sample}_{lane}_R1.fq.gz",
-        r2 = "trm/ddp/{sample}_{lane}_R2.fq.gz",
-    log: "trm/ddp/{sample}_{lane}.log"
+        r1 = "trm/clu/{sample}_{lane}_R1.fq.gz",
+        r2 = "trm/clu/{sample}_{lane}_R2.fq.gz",
+    log: "trm/clu/{sample}_{lane}.log"
     threads: 12
-    message: """ clumpify - err-corr & dedup (sample {wildcards.sample}_{wildcards.lane})."""
+    message: """ clumpify - err-corr (no dedup) (sample {wildcards.sample}_{wildcards.lane})."""
     shell:
         """
-        /home/schimar/bio/bbmap/clumpify.sh Xmx16g in1={input.r1} in2={input.r2} out1={output.r1} out2={output.r2} dedupe=t ecc=t optical=t spany=t adjacent=t dupedist=40 unpair=t repair=t 2> {log}  
+        /home/schimar/bio/bbmap/clumpify.sh Xmx16g in1={input.r1} in2={input.r2} out1={output.r1} out2={output.r2} dedupe=f ecc=t optical=t spany=t adjacent=t dupedist=40 unpair=t repair=t 2> {log}  
         """
 # >> {output.smp} 2>&1
 
 rule tadpole:
     input: 
-        r1 = "trm/ddp/{sample}_{lane}_R1.fq.gz",
-        r2 = "trm/ddp/{sample}_{lane}_R2.fq.gz"
+        r1 = "trm/clu/{sample}_{lane}_R1.fq.gz",
+        r2 = "trm/clu/{sample}_{lane}_R2.fq.gz"
     output:
-        r1eco = "trm/eco/{sample}_{lane}_R1.fq.gz",
-        r2eco = "trm/eco/{sample}_{lane}_R2.fq.gz",
-    log: "trm/eco/{sample}_{lane}.log"
+        r1tad = "trm/tad/{sample}_{lane}_R1.fq.gz",
+        r2tad = "trm/tad/{sample}_{lane}_R2.fq.gz",
+    log: "trm/tad/{sample}_{lane}.log"
     threads: 12
     message: """tadpole - err-corr (sample {wildcards.sample}_{wildcards.lane})."""
     shell:
         """
-        /home/schimar/bio/bbmap/tadpole.sh -Xmx16g in1={input.r1} in2={input.r2} out1={output.r1eco} out2={output.r2eco} mode=correct k=50 overwrite=t 2> {log}
+        /home/schimar/bio/bbmap/tadpole.sh -Xmx16g in1={input.r1} in2={input.r2} out1={output.r1tad} out2={output.r2tad} mode=correct k=50 overwrite=t 2> {log}
         """
 # >> {output.smp} 2>&1
 
