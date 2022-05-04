@@ -9,7 +9,7 @@ rule qc:
     #    mem = 1000,
     #    time = 300
     threads: 1
-    message: """--- Quality check of raw data with FastQC before trimming."""
+    message: """--- FastQC - ({wildcards.sample})."""
     shell: """
         fastqc -o raw/qc/fastqc/ -f fastq {input.r1} &
         fastqc -o raw/qc/fastqc/ -f fastq {input.r2}
@@ -29,7 +29,7 @@ rule trim:
         r1trmd = "trm/{sample}_R1.fq.gz",
         r2trmd = "trm/{sample}_R2.fq.gz"
     threads: 2
-    message: """--- Quality trimming of fastq files."""
+    message: """--- bbduk - qual & adapt trimming ({wildcards.sample})."""
     shell: 
         """
         /home/schimar/bio/bbmap/bbduk.sh -Xmx1g in1={input.r1} in2={input.r2} out1={output.r1trmd} out2={output.r2trmd} trimq=6 qtrim=r hdist=1 bhist=trm/hist/{wildcards.sample}.bhist qhist=trm/hist/{wildcards.sample}.qhist lhist=trm/hist/{wildcards.sample}.lhist tpe tbo 
@@ -44,11 +44,11 @@ rule clumpify:
         r1 = "trm/ddp/{sample}_{lane}_R1.fq.gz",
         r2 = "trm/ddp/{sample}_{lane}_R2.fq.gz",
     log: "trm/ddp/{sample}_{lane}.log"
-    threads: 6
-    message: """Deduplication of reads using clumpify."""
+    threads: 4
+    message: """ clumpify - err-corr & dedup (sample {wildcards.sample}_{wildcards.lane})."""
     shell:
         """
-        /home/schimar/bio/bbmap/clumpify.sh Xmx15g in1={input.r1} in2={input.r2} out1={output.r1} out2={output.r2} dedupe=t ecc=t optical=t spany=t adjacent=t dupedist=40 unpair=t repair=t 2> {log}  
+        /home/schimar/bio/bbmap/clumpify.sh Xmx10g in1={input.r1} in2={input.r2} out1={output.r1} out2={output.r2} dedupe=t ecc=t optical=t spany=t adjacent=t dupedist=40 unpair=t repair=t 2> {log}  
         """
 # >> {output.smp} 2>&1
 
@@ -60,11 +60,11 @@ rule tadpole:
         r1eco = "trm/eco/{sample}_{lane}_R1.fq.gz",
         r2eco = "trm/eco/{sample}_{lane}_R2.fq.gz",
     log: "trm/eco/{sample}_{lane}.log"
-    threads: 6
-    message: """Error-correction of fastq files with tadpole."""
+    threads: 4
+    message: """tadpole - err-corr (sample {wildcards.sample}_{wildcards.lane})."""
     shell:
         """
-        /home/schimar/bio/bbmap/tadpole.sh -Xmx15g in1={input.r1} in2={input.r2} out1={output.r1eco} out2={output.r2eco} mode=correct k=50 overwrite=t 2> {log}
+        /home/schimar/bio/bbmap/tadpole.sh -Xmx10g in1={input.r1} in2={input.r2} out1={output.r1eco} out2={output.r2eco} mode=correct k=50 overwrite=t 2> {log}
         """
 # >> {output.smp} 2>&1
 
